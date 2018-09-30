@@ -1,7 +1,7 @@
 splunk-common
 =========
 
-Installation and basic configuration of Splunk Enterprise.
+Installation and basic configuration of [Splunk Enterprise](https://www.splunk.com/en_us/download/splunk-enterprise.html).
 
 Splunk Enterprise version updates can be installed by incrementing the `splunk_version` variable and its correcponding `splunk_build` variable.
 
