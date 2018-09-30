@@ -1,0 +1,11 @@
+---
+- name: accept license and start splunk
+  shell: /opt/splunk/bin/splunk start --accept-license --answer-yes
+  become: yes
+  become_user: "{{ splunk_os_user }}"
+
+- name: enable boot-start
+  shell: /opt/splunk/bin/splunk enable boot-start -user {{ splunk_os_user }}
+
+- name: make /etc/init.d/splunk executable
+  file: path=/etc/init.d/splunk mode=0755

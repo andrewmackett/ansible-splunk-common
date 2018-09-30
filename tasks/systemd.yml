@@ -1,0 +1,12 @@
+---
+- name: splunk.service systemd unit file
+  template:
+    src: splunk.service.j2
+    dest: /etc/systemd/system/splunk.service
+    mode: 0664
+  notify: systemctl daemon-reload
+
+- name: enable splunk.service
+  systemd:
+    name: splunk.service
+    enabled: true

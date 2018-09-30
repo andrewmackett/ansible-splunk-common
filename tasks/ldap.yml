@@ -1,0 +1,219 @@
+---
+- name: checking if authentication.conf exists
+  stat: path=/opt/splunk/etc/system/local/authentication.conf
+  register: authentication_conf_path
+
+- name: touch to ensure authentication.conf exists
+  file:
+    path: /opt/splunk/etc/system/local/authentication.conf
+    state: touch
+  become: yes
+  become_user: splunk
+  when: authentication_conf_path.stat.exists == False
+
+- name: auth type
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "authentication"
+    option: authType
+    value: "LDAP"
+  notify: restart splunk
+
+- name: authSettings
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "authentication"
+    option: authSettings
+    value: "{{auth_settings_name}}"
+  notify: restart splunk
+
+- name: SSLEnabled
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: SSLEnabled
+    value: 0
+  notify: restart splunk
+
+- name: bindDN
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: bindDN
+    value: "{{ bind_dn }}"
+  notify: restart splunk
+
+- name: bindDNpassword
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: bindDNpassword
+    value: "{{ bind_dn_password }}"
+  notify: restart splunk
+
+- name: groupBaseDN
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: groupBaseDN
+    value: "{{ group_base_dn }}"
+  notify: restart splunk
+
+- name: groupBaseFilter
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: groupBaseFilter
+    value: ""
+  notify: restart splunk
+
+- name: groupMappingAttribute
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: groupMappingAttribute
+    value: "dn"
+  notify: restart splunk
+
+- name: groupMemberAttribute
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: groupMemberAttribute
+    value: "member"
+  notify: restart splunk
+
+- name: groupNameAttribute
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: groupNameAttribute
+    value: "cn"
+  notify: restart splunk
+
+- name: host
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: host
+    value: "{{ ldap_host }}"
+  notify: restart splunk
+
+- name: port
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: port
+    value: "{{ ldap_port }}"
+  notify: restart splunk
+
+- name: realNameAttribute
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: realNameAttribute
+    value: "displayname"
+  notify: restart splunk
+
+- name: userBaseDN
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: userBaseDN
+    value: "{{ user_base_dn }}"
+  notify: restart splunk
+
+- name: userBaseFilter
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: userBaseFilter
+    value: ""
+  notify: restart splunk
+
+- name: userNameAttribute
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: userNameAttribute
+    value: "sAMAccountName"
+  notify: restart splunk
+
+- name: timelimit
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: timelimit
+    value: 15
+  notify: restart splunk
+
+- name: network_timeout
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: network_timeout
+    value: 20
+  notify: restart splunk
+
+- name: anonymous_referrals
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: anonymous_referrals
+    value: 0
+  notify: restart splunk
+
+- name: nestedGroups
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "{{auth_settings_name}}"
+    option: nestedGroups
+    value: 1
+  notify: restart splunk
+
+- name: role map admin users
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "roleMap_{{auth_settings_name}}"
+    option: admin
+    value: "{{ splunk_admin_ad_group }}"
+  notify: restart splunk
+
+- name: role map power users
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "roleMap_{{auth_settings_name}}"
+    option: power
+    value: "{{ splunk_power_ad_group }}"
+  notify: restart splunk
+
+- name: role map standard users
+  ini_file:
+    path: "/opt/splunk/etc/system/local/authentication.conf"
+    state: present
+    section: "roleMap_{{auth_settings_name}}"
+    option: user
+    value: "{{ splunk_user_ad_group }}"
+  notify: restart splunk

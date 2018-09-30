@@ -1,0 +1,6 @@
+# Cmnd alias specification
+Cmnd_Alias SPLUNK_CMDS = /opt/splunk/bin/splunk, /etc/init.d/splunk
+
+# Splunk group to command mappings
+# This gives the splunk group sudo privs for splunk
+%splunk ALL=({{ splunk_os_group }}) SPLUNK_CMDS

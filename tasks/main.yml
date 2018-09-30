@@ -1,0 +1,9 @@
+---
+- include_tasks: splunk.yml
+- include_tasks: conf.yml
+- include_tasks: security.yml
+- include_tasks: ldap.yml
+  when: enable_ldap
+
+- name: Finished
+  debug: msg="Splunk web interface at https://{{ inventory_hostname }}:{{splunk_common_http_port }}"

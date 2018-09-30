@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Splunk Enterprise
+After=network.target
+Wants=network.target
+
+[Service]
+Type=forking
+RemainAfterExit=yes
+User={{ splunk_os_user }}
+Group={{ splunk_os_group }}
+LimitNOFILE=65536
+ExecStart=/opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt
+ExecStop=/opt/splunk/bin/splunk stop
+ExecReload=/opt/splunkforwarder/bin/splunk restart
+PIDFile=/opt/splunk/var/run/splunk/splunkd.pid
+Restart=on-failure
+TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target

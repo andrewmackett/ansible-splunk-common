@@ -1,0 +1,109 @@
+---
+- name: checking if server.conf exists
+  stat: path=/opt/splunk/etc/system/local/server.conf
+  register: server_conf_path
+
+- name: touch to ensure server.conf exists
+  file:
+    path: /opt/splunk/etc/system/local/server.conf
+    state: touch
+  become: yes
+  become_user: "{{ splunk_os_user }}"
+  when: server_conf_path.stat.exists == False
+
+- name: set servername
+  ini_file:
+    path: /opt/splunk/etc/system/local/server.conf
+    state: present
+    section: general
+    option: serverName
+    value: "{{ ansible_hostname }}"
+  notify: restart splunk
+
+- name: checking if inputs.conf exists
+  stat: path=/opt/splunk/etc/system/local/inputs.conf
+  register: inputs_conf_path
+
+- name: touch to ensure inputs.conf exists
+  file:
+    path: /opt/splunk/etc/system/local/inputs.conf
+    state: touch
+  become: yes
+  become_user: "{{ splunk_os_user }}"
+  when: inputs_conf_path.stat.exists == False
+
+- name: set host in inputs.conf
+  ini_file:
+    path: /opt/splunk/etc/system/local/server.conf
+    state: present
+    section: default
+    option: host
+    value: "{{ ansible_hostname }}"
+  notify: restart splunk
+
+
+- name: checking if web.conf exists
+  stat: path=/opt/splunk/etc/system/local/web.conf
+  register: web_conf_path
+
+- name: touch to ensure web.conf exists
+  file:
+    path: /opt/splunk/etc/system/local/web.conf
+    state: touch
+  become: yes
+  become_user: "{{ splunk_os_user }}"
+  when: web_conf_path.stat.exists == False
+
+- name: set enableSplunkWebSSL
+  ini_file:
+    path: /opt/splunk/etc/system/local/web.conf
+    state: present
+    section: settings
+    option: enableSplunkWebSSL
+    value: "{{ splunk_common_enable_ssl }}"
+  notify: restart splunk
+
+- name: set httpport
+  ini_file:
+    path: /opt/splunk/etc/system/local/web.conf
+    state: present
+    section: settings
+    option: httpport
+    value: "{{ splunk_common_http_port }}"
+  notify: restart splunk
+
+- name: set privKeyPath
+  ini_file:
+    path: /opt/splunk/etc/system/local/web.conf
+    state: present
+    section: settings
+    option: privKeyPath
+    value: "{{ splunk_common_certs_folder }}/{{ splunk_common_splunk_key }}"
+  notify: restart splunk
+
+- name: set caCertPath
+  ini_file:
+    path: /opt/splunk/etc/system/local/web.conf
+    state: present
+    section: settings
+    option: caCertPath
+    value: "{{ splunk_common_certs_folder }}/{{ splunk_common_splunk_cert }}"
+  notify: restart splunk
+
+- name: set allowSslRenegotiation
+  ini_file:
+    path: /opt/splunk/etc/system/local/web.conf
+    state: present
+    section: settings
+    option: allowSslRenegotiation
+    value: "{{ splunk_common_allowSslRenegotiation }}"
+  notify: restart splunk
+
+
+- name: Configure splunk-launch.conf
+  template:
+    src: splunk-launch.conf.j2
+    dest: /opt/splunk/etc/splunk-launch.conf
+    owner: "{{ splunk_os_user }}"
+    group: "{{ splunk_os_group }}"
+  notify: restart splunk

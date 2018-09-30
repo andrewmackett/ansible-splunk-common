@@ -1,0 +1,6 @@
+---
+
+- name: stop splunk before upgrade
+  service:
+    name: splunk
+    state: stopped

@@ -1,0 +1,21 @@
+galaxy_info:
+  role_name: splunk-common
+  author: Andrew Mackett
+  description: Installation and basic configuration of Splunk Enterprise
+
+  license: MIT
+
+  min_ansible_version: 2.3
+
+  platforms:
+  - name: Ubuntu
+    versions:
+      - all
+
+  galaxy_tags:
+    - splunk
+    - logs
+    - search
+
+  dependencies:
+    - pyOpenSSL

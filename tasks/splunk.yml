@@ -1,0 +1,69 @@
+---
+- name: add splunk group
+  group: name={{ splunk_os_group }} state=present
+
+- name: add splunk user
+  user: name={{ splunk_os_user }} comment="Splunk service user" shell=/usr/sbin/nologin groups={{ splunk_os_group }} createhome=yes
+
+- name: make /opt writetable by splunk
+  file: path=/opt mode=0777
+
+- name: check for existing splunk version
+  shell: dpkg-query --showformat='${Version}' --show splunk
+  changed_when: False
+  ignore_errors: yes
+  register: dpkg_result
+
+- name: splunk upgrade tasks
+  include_tasks: splunk-upgrade.yml
+  when:
+    - 'splunk_version != dpkg_result.stdout'
+    - 'dpkg_result.rc != 1'
+
+- name: download splunk deb file
+  get_url:
+    url: "{{ splunk_deb_url }}"
+    dest: "/tmp/{{ splunk_deb_url | basename }}"
+    checksum: "md5:{{ (lookup('url', splunk_deb_url + '.md5')).split(' ')[-1] }}"
+
+- name: install splunk from deb
+  apt:
+    deb: "/tmp/{{ splunk_deb_url | basename }}"
+    state: present
+    force: yes
+  when: skip_upgrade is not defined
+  register: splunk_installed
+  notify: restart splunk
+
+- name: pin splunk version
+  dpkg_selections:
+    name: splunk
+    selection: hold
+
+- name: set splunk.secret file
+  template:
+    src: splunk.secret.j2
+    dest: /opt/splunk/etc/auth/splunk.secret
+    owner: "{{ splunk_os_user }}"
+    group: "{{ splunk_os_group }}"
+    mode: 0400
+  notify: restart splunk
+
+- name: upstart setup
+  include_tasks: upstart.yml
+  when:
+    - ansible_service_mgr == "upstart"
+    - splunk_installed.changed
+
+- name: systemd setup
+  include_tasks: systemd.yml
+  when:
+    - ansible_service_mgr == "systemd"
+
+- name: touch ui so it does not ask for the password to be changed
+  file:
+    path: /opt/splunk/etc/.ui_login
+    state: touch
+  become: yes
+  become_user: "{{ splunk_os_user }}"
+  when: splunk_installed.changed
