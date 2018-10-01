@@ -2,28 +2,33 @@
 language: python
 python: "2.7"
 
-# Use the new container infrastructure
-sudo: false
+sudo: required
+dist: trusty
 
-# Install ansible
-addons:
-  apt:
-    packages:
-    - python-pip
+branches:
+  only:
+  - master
 
-install:
-  # Install ansible
-  - pip install ansible
+env:
+  - ANSIBLE_VERSION=latest
+  - ANSIBLE_VERSION=2.6.4
+  - ANSIBLE_VERSION=2.5.10
+  - ANSIBLE_VERSION=2.4.6.0
+  - ANSIBLE_VERSION=2.3.3.0
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y python-pip
   - pip install pyOpenSSL
 
-  # Check ansible version
+install:
+  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible; else pip install ansible==$ANSIBLE_VERSION; fi
   - ansible --version
 
   # Create ansible.cfg with correct roles_path
   - printf '[defaults]\nroles_path=../' >ansible.cfg
 
 script:
-  # Basic role syntax check
   - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
   - ansible-playbook tests/test.yml -i tests/inventory --connection=local
 
