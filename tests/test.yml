@@ -1,6 +1,4 @@
 ---
-- hosts: vagrant
-  gather_facts: yes
-  become: yes
+- hosts: all
   roles:
-    - role: ansible-splunk-common
+    - splunk-common

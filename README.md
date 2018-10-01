@@ -55,7 +55,7 @@ Example playbook:
       roles:
          - { role: andrewmackett.splunk_common, splunk_version: 7.1.3, splunk_build: 51d9cac7b837 }
 
-There's also a Vagrantfile in [tests](./tests) that you can use to start up a local test server.
+There's also a Vagrantfile that you can use to start up a local test server.
 
 License
 -------
