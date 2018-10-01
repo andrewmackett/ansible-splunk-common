@@ -1,20 +1,21 @@
 ---
-language: python
-python: "2.7"
-
 sudo: required
 dist: xenial
 
-branches:
-  only:
-  - master
+language: python
+python:
+  - "2.7"
+  - "3.6"
 
 env:
   - ANSIBLE_VERSION=latest
   - ANSIBLE_VERSION=2.6.4
   - ANSIBLE_VERSION=2.5.10
   - ANSIBLE_VERSION=2.4.6.0
-  - ANSIBLE_VERSION=2.3.3.0
+
+branches:
+  only:
+  - master
 
 before_install:
   - sudo apt-get update -qq
